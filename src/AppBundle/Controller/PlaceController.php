@@ -8,8 +8,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use AppBundle\Entity\Place;
 use AppBundle\Entity\Meal;
+use AppBundle\Entity\Menu;
 use AppBundle\Form\PlaceType;
 use AppBundle\Form\MealType;
+use AppBundle\Form\MenuType;
 
 /**
  * Place controller.
@@ -54,6 +56,10 @@ class PlaceController extends Controller
 
             $em->flush();
 
+            $request->getSession()
+                ->getFlashBag()
+                ->add('success', 'New place saved in database.');
+
             return $this->redirectToRoute('place_show', array('id' => $place->getId()));
         }
 
@@ -74,15 +80,29 @@ class PlaceController extends Controller
         $deleteForm = $this->createDeleteForm($place);
 
         $meal = new Meal();
-        $form = $this->createForm(MealType::class, $meal);
-        $form->handleRequest($request);
+        $meal->setPlace($place);
+        $addMealForm = $this->createForm(MealType::class, $meal);
+        $addMealForm->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($addMealForm->isSubmitted() && $addMealForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
-            $meal->setPlace($place);
-
             $em->persist($meal);
+            $em->flush();
+
+            return $this->redirectToRoute('place_show', array('id' => $place->getId()));
+        }
+
+        $menu = new Menu();
+        $menu->setPlace($place);
+        $addMenuForm = $this->createForm(MenuType::class, $menu);
+        $addMenuForm->handleRequest($request);
+
+        // TODO: ADD THE MEALS TO THE MENU ENTITY
+        if ($addMenuForm->isSubmitted() && $addMenuForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+
+            $em->persist($menu);
             $em->flush();
 
             return $this->redirectToRoute('place_show', array('id' => $place->getId()));
@@ -91,7 +111,8 @@ class PlaceController extends Controller
         return $this->render('place/show.html.twig', array(
             'place' => $place,
             'delete_form' => $deleteForm->createView(),
-            'formMeal'  => $form->createView(),
+            'add_meal_form' => $addMealForm->createView(),
+            'add_menu_form' => $addMenuForm->createView()
         ));
     }
 
@@ -104,6 +125,7 @@ class PlaceController extends Controller
     public function editAction(Request $request, Place $place)
     {
         $deleteForm = $this->createDeleteForm($place);
+
         $editForm = $this->createForm('AppBundle\Form\PlaceType', $place);
         $editForm->handleRequest($request);
 
@@ -173,7 +195,6 @@ class PlaceController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('place_delete', array('id' => $place->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
     }
 }
