@@ -40,7 +40,16 @@
         "snc/redis-bundle": "2.x-dev",
         "predis/predis": "^1.0",
         "willdurand/faker-bundle": "^1.3",
+<<<<<<< HEAD
         "friendsofsymfony/user-bundle": "~2.0@dev"
+=======
+        "friendsofsymfony/user-bundle": "~2.0@dev",
+        "egeloen/google-map-bundle": "^3.0",
+        "egeloen/serializer-bundle": "^1.0",
+        "php-http/httplug-bundle": "^1.4",
+        "php-http/guzzle6-adapter": "^1.1",
+        "knplabs/knp-paginator-bundle": "^2.5"
+>>>>>>> a4799e24bc0d5c32fff3ae1bf471faa798d473dc
 
     },
     "require-dev": {
